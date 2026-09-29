@@ -2,7 +2,7 @@
 
 Game mencocokkan kartu bertema hutan. Situs statis murni (HTML + CSS + JavaScript vanilla): tanpa build step dan tanpa dependency npm.
 
-**Demo:** _(isi dengan link setelah situs live, mis. `https://aisacredoctagon-creator.github.io/MemoryMatch/`)_
+**Demo:** https://aisacredoctagon-creator.github.io/MemoryMatch/
 
 ## Cara main
 1. Pilih ukuran papan di dropdown **Ukuran** (4×4, 4×5, 5×6, 6×6, atau 6×8). Mengganti ukuran langsung memulai game baru.
