@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#194017">
+  <meta name="description" content="Memory Match: petualangan rimba, game mencocokkan kartu tanpa instalasi.">
+  <title>Memory Match</title>
+
+  <!-- Open Graph / pratinjau saat link dibagikan. og:image harus URL absolut
+       (WhatsApp dan sosial media tidak membaca path relatif); ubah jika nama repo berganti. -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Memory Match">
+  <meta property="og:locale" content="id_ID">
+  <meta property="og:title" content="Memory Match: Petualangan Rimba">
+  <meta property="og:description" content="Game mencocokkan kartu bertema hutan. Pilih ukuran grid dari 4×4 sampai 6×8 dan pecahkan rekormu!">
+  <meta property="og:url" content="https://aisacredoctagon-creator.github.io/MemoryMatch/">
+  <meta property="og:image" content="https://aisacredoctagon-creator.github.io/MemoryMatch/assets/og-image.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Logo Memory Match dengan deretan kartu oranye dan hijau bertema hutan">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Freckle+Face&family=Luckiest+Guy&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Latar hutan (dekoratif) -->
+  <div class="scene" aria-hidden="true">
+    <div class="scene__base"></div>
+    <div class="scene__rays">
+      <img class="ray ray--1" src="assets/ray-1.svg" alt="">
+      <img class="ray ray--2" src="assets/ray-2.svg" alt="">
+      <img class="ray ray--3" src="assets/ray-3.svg" alt="">
+      <img class="ray ray--4" src="assets/ray-4.svg" alt="">
+      <img class="ray ray--5" src="assets/ray-5.svg" alt="">
+    </div>
+    <img class="scene__leaves" src="assets/leaves.svg" alt="">
+  </div>
+
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand__badge" aria-hidden="true">🃏<span class="brand__sparkle">✨</span></span>
+        <div class="brand__text">
+          <h1 class="brand__title" aria-label="Memory Match"><span>Memory</span><span>Match</span></h1>
+          <p class="brand__tagline">Petualangan Rimba</p>
+        </div>
+      </div>
+
+      <div class="controls">
+        <label class="size">
+          <span class="size__label">Ukuran</span>
+          <select id="size" name="size">
+            <option value="4x4">4 × 4</option>
+            <option value="4x5">4 × 5</option>
+            <option value="5x6">5 × 6</option>
+            <option value="6x6">6 × 6</option>
+            <option value="6x8">6 × 8</option>
+          </select>
+        </label>
+        <button type="button" id="restart" class="btn-reset">
+          <img src="assets/icon-restart.svg" alt="" width="16" height="16">
+          <span class="btn-reset__text">Ulang</span>
+        </button>
+      </div>
+    </header>
+
+    <dl class="stats">
+      <div class="stat">
+        <dt><span aria-hidden="true">🐾</span> Langkah</dt>
+        <dd id="moves" class="stat__value stat__value--moves">0</dd>
+      </div>
+      <div class="stat">
+        <dt><span aria-hidden="true">⏳</span> Waktu</dt>
+        <dd id="time" class="stat__value stat__value--time">0:00</dd>
+      </div>
+      <div class="stat">
+        <dt><span aria-hidden="true">🏆</span> Terbaik</dt>
+        <dd id="best" class="stat__value stat__value--best">–</dd>
+      </div>
+    </dl>
+
+    <div id="progress" class="progress" role="progressbar" aria-label="Pasangan ditemukan"
+         aria-valuemin="0" aria-valuemax="1" aria-valuenow="0">
+      <div class="progress__track"><span class="progress__bar"></span></div>
+    </div>
+
+    <main class="stage">
+      <div class="frame">
+        <i class="rivet rivet--tl" aria-hidden="true"></i>
+        <i class="rivet rivet--tr" aria-hidden="true"></i>
+        <i class="rivet rivet--bl" aria-hidden="true"></i>
+        <i class="rivet rivet--br" aria-hidden="true"></i>
+        <div id="board" class="board" role="group" aria-label="Papan kartu"></div>
+      </div>
+      <p class="footer">
+        <span class="footer__dot" aria-hidden="true"></span>
+        <span id="footer-text">0 pasang ditemukan · lanjutkan petualangan!</span>
+      </p>
+    </main>
+
+    <!-- Sulur dekoratif di tepi atas -->
+    <span class="vines vines--left" aria-hidden="true"><span>🍃</span><span>🌿</span></span>
+    <span class="vines vines--right" aria-hidden="true"><span>🌿</span><span>🌱</span></span>
+  </div>
+
+  <p id="status" class="sr-only" role="status" aria-live="polite"></p>
+
+  <dialog id="win" class="modal" aria-labelledby="win-title">
+    <h2 id="win-title" class="modal__title">Selamat! 🎉</h2>
+    <p class="modal__lead">Semua pasangan berhasil ditemukan.</p>
+    <dl class="modal__stats">
+      <div>
+        <dt>Langkah</dt>
+        <dd id="win-moves">0</dd>
+      </div>
+      <div>
+        <dt>Waktu</dt>
+        <dd id="win-time">0:00</dd>
+      </div>
+    </dl>
+    <p id="win-record" class="modal__record" hidden></p>
+    <button type="button" id="again" class="btn-play" autofocus>Main Lagi</button>
+  </dialog>
+
+  <noscript><p class="noscript">Game ini membutuhkan JavaScript.</p></noscript>
+  <script src="script.js"></script>
+</body>
+</html>

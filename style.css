@@ -1,0 +1,784 @@
+/* =========================================================
+   Memory Match: Petualangan Rimba
+   Sumber desain: Figma (frame desktop 1280 x 910, satu tema gelap).
+   Semua nilai desain ada di :root. Ubah di sini, bukan di komponen.
+   ========================================================= */
+
+:root {
+  color-scheme: dark;
+
+  /* ---------- Font ---------- */
+  --font-display: "Luckiest Guy", "Arial Rounded MT Bold", "Trebuchet MS", Impact, sans-serif;
+  --font-ui: "Fredoka", "Arial Rounded MT Bold", "Trebuchet MS", system-ui, sans-serif;
+  --font-tagline: "Freckle Face", "Comic Sans MS", "Trebuchet MS", cursive;
+  --font-emoji: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+
+  /* ---------- Warna: latar ---------- */
+  --color-scene-glow-1: #2d5a27;
+  --color-scene-glow-2: #173315;
+  --color-scene-glow-3: #0d1b0d;
+  --color-scene-top: #194017;
+  --color-scene-mid: #0f2812;
+  --color-scene-bottom: #071308;
+  --ray-opacity: 0.35;
+
+  /* ---------- Warna: logo & teks ---------- */
+  --color-title-1: #fcd34d;
+  --color-title-2: #facc15;
+  --color-title-shadow: #5b2803;
+  --color-tagline: #bef264;
+  --color-badge-bg: #fbbf24;
+  --color-badge-border: #fef08a;
+  --color-text: #fef3c7;
+  --color-text-soft: #fde68a;
+  --color-focus: #fef08a;
+
+  /* ---------- Warna: papan skor ---------- */
+  --color-panel-top: #44220b;
+  --color-panel-bottom: #2f1606;
+  --color-panel-border: #6d3e1d;
+  --color-panel-label: rgb(251 191 36 / 0.8);
+  --color-value-moves: #fef3c7;
+  --color-value-time: #fde047;
+  --color-value-best: #fde68a;
+
+  /* ---------- Warna: progres & footer ---------- */
+  --color-track-bg: #1e1005;
+  --color-track-border: rgb(120 53 15 / 0.6);
+  --color-fill-from: #f59e0b;
+  --color-fill-to: #facc15;
+  --color-footer-dot: #a3e635;
+  --color-footer-text: rgb(163 230 53 / 0.8);
+
+  /* ---------- Warna: bingkai papan ---------- */
+  --color-frame-bg: #201105;
+  --color-frame-border: #5e3112;
+  --color-rivet: #92400e;
+  --color-rivet-border: rgb(202 138 4 / 0.5);
+
+  /* ---------- Warna: kartu tertutup ---------- */
+  --color-tile-1: #fca750;
+  --color-tile-2: #ed8627;
+  --color-tile-3: #ce6410;
+  --color-tile-border: rgb(252 211 77 / 0.4);
+  --color-tile-lip: #5c2c06;
+  --color-tile-lip-inner: #b35917;
+  --color-tile-mark: rgb(59 26 3 / 0.85);
+
+  /* ---------- Warna: kartu cocok ---------- */
+  --color-match-1: #2f5d47;
+  --color-match-2: #1f4232;
+  --color-match-3: #132d21;
+  --color-match-border: #34d399;
+  --color-match-lip: #081c15;
+  --color-match-lip-inner: #1b4332;
+  --color-match-badge: rgb(52 211 153 / 0.9);
+  --color-match-text: #d1fae5;
+
+  /* ---------- Warna: kartu terbuka (tidak ada di Figma, turunan palet) ---------- */
+  --color-open-1: #fef3c7;
+  --color-open-2: #fde68a;
+  --color-open-border: #fcd34d;
+  --color-wrong: #dc2626;
+
+  /* ---------- Warna: kontrol ---------- */
+  --color-select-bg: #29170a;
+  --color-select-border: #5c3014;
+  --color-select-label: rgb(253 230 138 / 0.7);
+  --color-select-text: #fcd34d;
+  --color-reset-from: #f43f5e;
+  --color-reset-to: #b91c1c;
+  --color-reset-border: #fca5a5;
+  --color-reset-lip: #9b111e;
+  --color-on-reset: #ffffff;
+
+  /* ---------- Radius ---------- */
+  --radius-control: 12px;
+  --radius-panel: 16px;
+  --radius-frame: 24px;
+  --radius-pill: 9999px;
+
+  /* ---------- Bayangan ---------- */
+  --shadow-panel: 0 3px 6px rgb(0 0 0 / 0.4);
+  --shadow-panel-inset: inset 0 3px 6px 2px rgb(0 0 0 / 0.6), inset 0 -2px 0 2px rgb(255 255 255 / 0.1);
+  --shadow-frame: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  --shadow-badge: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-inset-soft: inset 0 2px 4px rgb(0 0 0 / 0.05);
+  --shadow-fill: 0 1px 3px rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-drop-vine: drop-shadow(0 1px 0.5px rgb(0 0 0 / 0.06)) drop-shadow(0 1px 1px rgb(0 0 0 / 0.1));
+
+  /* ---------- Spasi & ukuran layout ---------- */
+  --page-pad: 24px;
+  --app-max-w: 620px;
+  --space-section: 16px;       /* jarak header ke skor, skor ke progres */
+  --space-progress: 20px;      /* jarak progres ke bingkai */
+  --footer-h: 32px;
+  --frame-border: 4px;
+  --frame-pad: 20px;           /* 24px dari tepi luar Figma, termasuk border 4px */
+  --panel-gap: 14px;
+  --badge-size: 48px;
+  --title-size: 36px;
+  --tagline-size: 12px;
+  --value-size: 30px;
+  --value-lh: 36px;
+  --value-best-lg: 24px;
+  --value-best-sm: 18px;
+  --label-size: 12px;
+  --panel-pad: 12px;           /* 14px dari tepi luar Figma, termasuk border 2px */
+  --flip: 450ms;
+}
+
+/* ---------- Layar sempit: turunan responsif dari desain desktop ---------- */
+@media (max-width: 599px) {
+  :root {
+    --page-pad: 12px;
+    --space-section: 10px;
+    --space-progress: 10px;
+    --footer-h: 28px;
+    --frame-border: 3px;
+    --frame-pad: 8px;
+    --panel-gap: 8px;
+    --badge-size: 32px;
+    --title-size: clamp(17px, 5vw, 36px);
+    --tagline-size: 9px;
+    --value-size: 22px;
+    --value-lh: 28px;
+    --value-best-lg: 20px;
+    --value-best-sm: 14px;
+    --label-size: 10px;
+    --panel-pad: 8px 6px;
+  }
+}
+
+/* Layar pendek: rapatkan jarak vertikal */
+@media (max-height: 760px) and (min-width: 600px) {
+  :root {
+    --page-pad: 12px;
+    --space-section: 10px;
+    --space-progress: 12px;
+    --footer-h: 28px;
+  }
+}
+
+/* ---------- Base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  overflow: hidden;
+  padding: var(--page-pad);
+  background: radial-gradient(circle 1004px at 50% 15%,
+    var(--color-scene-glow-1) 0%, var(--color-scene-glow-2) 45%, var(--color-scene-glow-3) 85%);
+  color: var(--color-text);
+  font: 400 16px/1.4 var(--font-ui);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button, select { font: inherit; color: inherit; touch-action: manipulation; }
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Latar hutan ---------- */
+.scene {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.scene__base {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom,
+    var(--color-scene-top), var(--color-scene-mid) 50%, var(--color-scene-bottom));
+}
+.scene__rays {
+  position: absolute;
+  inset: 0;
+  opacity: var(--ray-opacity);
+  mix-blend-mode: screen;
+}
+.ray { position: absolute; top: 0; bottom: 0; display: block; }
+.ray--1 { left: 26%; width: 24%; height: 100%; }
+.ray--2 { left: 42%; width: 10%; height: 100%; }
+.ray--3 { left: 50%; width: 21%; height: 100%; }
+.ray--4 { left: 50%; width: 36%; height: 100%; }
+.ray--5 { left: 12%; width: 38%; height: 100%; }
+.scene__leaves {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- Cangkang aplikasi ---------- */
+.app {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  flex: 0 1 var(--app-max-w);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- Header ---------- */
+.topbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-inline: 5.62px 8px;
+  margin-bottom: var(--space-section);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 9.626px;
+  min-width: 0;
+}
+
+.brand__badge {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--badge-size);
+  height: var(--badge-size);
+  margin: calc(var(--badge-size) * 0.0495);
+  padding: 2px;
+  background: var(--color-badge-bg);
+  border: 2px solid var(--color-badge-border);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-badge);
+  font: 400 calc(var(--badge-size) * 0.5) / 1 var(--font-emoji);
+  transform: rotate(-6deg);
+}
+.brand__sparkle {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  font-size: calc(var(--badge-size) * 0.25);
+  line-height: 1;
+}
+
+.brand__text { min-width: 0; }
+
+.brand__title {
+  margin: 0;
+  display: flex;
+  gap: 6px;
+  font: 400 var(--title-size) / 1.111 var(--font-display);
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  text-shadow: 0 0.139em 0.167em rgb(0 0 0 / 0.5), 0 0.083em 0 var(--color-title-shadow);
+}
+.brand__title span:first-child { color: var(--color-title-1); }
+.brand__title span:last-child { color: var(--color-title-2); }
+
+.brand__tagline {
+  margin: 0;
+  padding-left: 2px;
+  color: var(--color-tagline);
+  font: 400 var(--tagline-size) / 1.333 var(--font-tagline);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.controls {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 10.01px;
+}
+
+/* Pemilih ukuran */
+.size {
+  display: flex;
+  align-items: center;
+  padding: 6px 10px;             /* 8px 12px dari tepi luar Figma, termasuk border 2px */
+  background: var(--color-select-bg);
+  border: 2px solid var(--color-select-border);
+  border-radius: var(--radius-control);
+  box-shadow: var(--shadow-inset-soft);
+}
+.size:has(select:focus-visible) {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+.size__label {
+  padding-right: 6px;
+  color: var(--color-select-label);
+  font: 600 12px / 16px var(--font-ui);
+  white-space: nowrap;
+}
+.size select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 0 24px 0 0;
+  border: 0;
+  border-radius: 0;
+  background: url("assets/icon-chevron.svg") right 8px center / 21px 21px no-repeat;
+  color: var(--color-select-text);
+  font: 700 14px / 20px var(--font-ui);
+  cursor: pointer;
+}
+.size select:focus { outline: none; }
+.size option { background: var(--color-select-bg); color: var(--color-select-text); }
+
+/* Tombol Ulang */
+.btn-reset {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;             /* 8px 16px dari tepi luar Figma, termasuk border 2px */
+  background: linear-gradient(to bottom, var(--color-reset-from), var(--color-reset-to));
+  border: 2px solid var(--color-reset-border);
+  border-radius: var(--radius-control);
+  box-shadow: 0 5px 0 var(--color-reset-lip), 0 8px 10px rgb(0 0 0 / 0.3);
+  color: var(--color-on-reset);
+  font: 400 16px / 24px var(--font-display);
+  cursor: pointer;
+}
+.btn-reset img { display: block; flex: none; }
+.btn-reset:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 4px;
+}
+
+@media (hover: hover) {
+  .btn-reset:hover, .btn-play:hover { filter: brightness(1.08); }
+}
+
+@media (pointer: coarse) {
+  .size, .btn-reset { min-height: 44px; }
+}
+
+/* HP sempit: label ukuran dan teks Ulang hanya untuk pembaca layar */
+@media (max-width: 599px) {
+  .size { padding-inline: 8px; }
+  .size__label, .btn-reset__text {
+    position: absolute;
+    width: 1px; height: 1px;
+    margin: -1px; padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .btn-reset { width: 40px; height: 40px; padding: 0; justify-content: center; }
+  .controls { gap: 8px; }
+}
+
+/* ---------- Papan skor ---------- */
+.stats {
+  flex: none;
+  display: flex;
+  gap: var(--panel-gap);
+  margin: 0 0 var(--space-section);
+}
+
+.stat {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--panel-pad);
+  background: linear-gradient(to bottom, var(--color-panel-top), var(--color-panel-bottom));
+  border: 2px solid var(--color-panel-border);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-panel), var(--shadow-panel-inset);
+  text-align: center;
+}
+.stat dt {
+  color: var(--color-panel-label);
+  font: 700 var(--label-size) / 1.333 var(--font-ui);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: pre;
+  height: calc(var(--label-size) * 1.333);
+}
+.stat dt span { font-family: var(--font-emoji); }
+.stat__value {
+  margin: 2px 0 0;
+  font: 400 var(--value-size) / var(--value-lh) var(--font-display);
+  letter-spacing: 0.025em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.stat__value--moves { color: var(--color-value-moves); }
+.stat__value--time { color: var(--color-value-time); }
+.stat__value--best {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--value-lh);
+  color: var(--color-value-best);
+}
+.best__moves { font-size: var(--value-best-lg); line-height: 1; white-space: pre; }
+.best__time { font-size: var(--value-best-sm); line-height: 1; }
+
+/* ---------- Progres ---------- */
+.progress {
+  flex: none;
+  margin-bottom: var(--space-progress);
+  padding: 4px;                  /* 5px dari tepi luar Figma, termasuk border 1px */
+  background: var(--color-track-bg);
+  border: 1px solid var(--color-track-border);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-inset-soft);
+}
+.progress__track {
+  height: 10px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+}
+.progress__bar {
+  display: block;
+  height: 100%;
+  background: linear-gradient(to right, var(--color-fill-from), var(--color-fill-to));
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-fill);
+  /* Bergeser dari kiri: ujung membulat tetap utuh, hanya transform yang beranimasi */
+  transform: translateX(calc((var(--p, 0) - 1) * 100%));
+  transition: transform 300ms ease-out;
+}
+
+/* ---------- Panggung papan ---------- */
+.stage {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  container-type: size;   /* cqw/cqh = ruang yang tersedia untuk bingkai + footer */
+}
+
+.frame {
+  position: relative;
+  width: fit-content;
+  padding: var(--frame-pad);
+  background: var(--color-frame-bg);
+  border: var(--frame-border) solid var(--color-frame-border);
+  border-radius: var(--radius-frame);
+  box-shadow: var(--shadow-frame);
+}
+
+.rivet {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: var(--color-rivet);
+  border: 1px solid var(--color-rivet-border);
+  border-radius: var(--radius-pill);
+}
+.rivet--tl { top: 7px; left: 7px; }
+.rivet--tr { top: 7px; right: 7px; }
+.rivet--bl { bottom: 7px; left: 7px; }
+.rivet--br { right: 7px; bottom: 7px; }
+
+@media (max-width: 599px) {
+  .rivet { display: none; }
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--footer-h);
+  margin: 0;
+  padding-top: calc(var(--footer-h) - 16px);
+  color: var(--color-footer-text);
+  font: 700 clamp(9px, 3.2vw, 12px) / 16px var(--font-ui);
+  white-space: nowrap;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.footer__dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  background: var(--color-footer-dot);
+  border-radius: var(--radius-pill);
+}
+
+/* ---------- Papan kartu ----------
+   Ukuran sel dihitung dari ruang yang tersedia (lebar dan tinggi panggung),
+   jadi papan selalu muat tanpa scroll. Pada 4x4 desktop hasilnya 132.5px
+   persis seperti Figma. */
+.board {
+  --cols: 4;
+  --rows: 4;
+  --gap: clamp(6px, calc(56px / var(--cols)), var(--panel-gap));
+  --chrome: calc(2 * (var(--frame-pad) + var(--frame-border)));
+  --cell: max(24px, min(
+    calc((100cqw - var(--chrome) - (var(--cols) - 1) * var(--gap)) / var(--cols)),
+    calc((100cqh - var(--footer-h) - var(--chrome) - (var(--rows) - 1) * var(--gap)) / var(--rows))
+  ));
+  --tile-radius: min(var(--radius-panel), calc(var(--cell) * 0.1208));
+  --lift: clamp(3px, calc(var(--cell) * 0.0453), 6px);
+
+  display: grid;
+  grid-template-columns: repeat(var(--cols), var(--cell));
+  grid-auto-rows: var(--cell);
+  gap: var(--gap);
+}
+
+/* ---------- Kartu ---------- */
+.card {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  border-radius: var(--tile-radius);
+  perspective: 700px;
+  cursor: pointer;
+}
+.card:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 4px;
+}
+.card[aria-disabled="true"] { cursor: default; }
+
+.card__inner {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transition: transform var(--flip) cubic-bezier(0.3, 0.7, 0.3, 1);
+  will-change: transform;
+}
+.card.is-open .card__inner,
+.card.is-matched .card__inner { transform: rotateY(180deg); }
+
+.face {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: var(--tile-radius);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  line-height: 1;
+}
+
+/* Tertutup */
+.face--cover {
+  background: radial-gradient(100% 100% at 40% 25%,
+    var(--color-tile-1) 0%, var(--color-tile-2) 60%, var(--color-tile-3) 100%);
+  border: 1px solid var(--color-tile-border);
+  box-shadow:
+    0 var(--lift) 0 var(--color-tile-lip),
+    0 10px 10px rgb(0 0 0 / 0.3),
+    inset 0 4px 0 rgb(255 255 255 / 0.4),
+    inset 0 calc(var(--lift) * -1) 0 var(--color-tile-lip-inner);
+  color: var(--color-tile-mark);
+  font: 400 calc(var(--cell) * 0.362) / 1 var(--font-display);
+  text-shadow: 0 1px 0.5px rgb(0 0 0 / 0.05);
+}
+
+/* Terbuka (belum cocok) */
+.face--symbol {
+  transform: rotateY(180deg);
+  background: radial-gradient(100% 100% at 40% 25%, var(--color-open-1), var(--color-open-2));
+  border: 2px solid var(--color-open-border);
+  box-shadow:
+    0 var(--lift) 0 var(--color-tile-lip),
+    0 10px 10px rgb(0 0 0 / 0.3),
+    inset 0 4px 0 rgb(255 255 255 / 0.4);
+  font: 400 calc(var(--cell) * 0.483) / 1 var(--font-emoji);
+}
+
+/* Cocok: hijau + lencana centang */
+.card.is-matched .face--symbol {
+  background: radial-gradient(100% 100% at 40% 30%,
+    var(--color-match-1) 0%, var(--color-match-2) 70%, var(--color-match-3) 100%);
+  border-color: var(--color-match-border);
+  box-shadow:
+    0 var(--lift) 0 var(--color-match-lip),
+    0 8px 12px rgb(0 0 0 / 0.35),
+    inset 0 4px 0 rgb(255 255 255 / 0.3),
+    inset 0 calc(var(--lift) * -1) 0 var(--color-match-lip-inner);
+}
+.card.is-matched .face--symbol::after {
+  content: "";
+  position: absolute;
+  top: clamp(3px, calc(var(--cell) * 0.0604), 8px);
+  right: clamp(3px, calc(var(--cell) * 0.0604), 8px);
+  width: clamp(18px, calc(var(--cell) * 0.2113), 28px);
+  aspect-ratio: 1;
+  background: var(--color-match-badge) url("assets/icon-check.svg") center / 57% no-repeat;
+  border: 1px solid #fff;
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-fill);
+}
+
+/* Ilustrasi Figma untuk simbol semangka */
+.face__art {
+  display: block;
+  width: calc(var(--cell) * 0.483);
+  height: calc(var(--cell) * 0.483);
+  transform: rotate(-12deg);
+  filter: drop-shadow(0 4px 1.5px rgb(0 0 0 / 0.1)) drop-shadow(0 10px 4px rgb(0 0 0 / 0.04));
+}
+
+.card.is-matched { animation: pop 380ms ease-out; }
+.card.is-wrong { animation: shake 380ms ease-in-out; }
+.card.is-wrong .face--symbol { border-color: var(--color-wrong); }
+
+@media (hover: hover) {
+  .card:not(.is-open):not(.is-matched):hover .face--cover { filter: brightness(1.08); }
+}
+
+@keyframes pop {
+  0%, 100% { transform: scale(1); }
+  45% { transform: scale(1.06); }
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+/* ---------- Sulur dekoratif ---------- */
+.vines {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-emoji);
+  filter: var(--shadow-drop-vine);
+  pointer-events: none;
+}
+.vines > span + span { margin-left: -8px; }
+.vines--left { top: -12px; left: 16px; }
+.vines--left > span:first-child { font-size: 24px; line-height: 32px; }
+.vines--left > span:last-child { font-size: 30px; line-height: 36px; }
+.vines--right { top: -16px; right: 24px; }
+.vines--right > span:first-child { font-size: 30px; line-height: 36px; }
+.vines--right > span:last-child { font-size: 24px; line-height: 32px; }
+
+@media (max-width: 599px) {
+  .vines { display: none; }
+}
+
+/* ---------- Modal kemenangan (tidak ada di Figma, turunan gaya desain) ---------- */
+.modal {
+  width: min(90vw, 360px);
+  padding: 24px;
+  background: var(--color-frame-bg);
+  border: var(--frame-border) solid var(--color-frame-border);
+  border-radius: var(--radius-frame);
+  box-shadow: var(--shadow-frame);
+  color: var(--color-text);
+  text-align: center;
+}
+.modal[open] { animation: fade-in 220ms ease-out; }
+.modal::backdrop { background: rgb(7 19 8 / 0.7); }
+
+.modal__title {
+  margin: 0 0 4px;
+  color: var(--color-title-1);
+  font: 400 32px / 1.25 var(--font-display);
+  letter-spacing: 0.05em;
+  text-shadow: 0 3px 0 var(--color-title-shadow);
+}
+.modal__lead { margin: 0 0 16px; color: var(--color-text-soft); font-weight: 600; }
+
+.modal__stats {
+  display: flex;
+  gap: var(--panel-gap);
+  margin: 0 0 16px;
+}
+.modal__stats > div {
+  flex: 1;
+  padding: 10px;
+  background: linear-gradient(to bottom, var(--color-panel-top), var(--color-panel-bottom));
+  border: 2px solid var(--color-panel-border);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-panel-inset);
+}
+.modal__stats dt {
+  color: var(--color-panel-label);
+  font: 700 12px / 16px var(--font-ui);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.modal__stats dd {
+  margin: 0;
+  color: var(--color-value-time);
+  font: 400 30px / 36px var(--font-display);
+  letter-spacing: 0.025em;
+  font-variant-numeric: tabular-nums;
+}
+
+.modal__record {
+  margin: 0 0 16px;
+  padding: 8px 12px;
+  background: var(--color-match-2);
+  border: 2px solid var(--color-match-border);
+  border-radius: var(--radius-control);
+  color: var(--color-match-text);
+  font-weight: 600;
+}
+
+.btn-play {
+  min-height: 44px;
+  padding: 8px 24px;
+  background: radial-gradient(100% 100% at 40% 25%,
+    var(--color-tile-1) 0%, var(--color-tile-2) 60%, var(--color-tile-3) 100%);
+  border: 1px solid var(--color-tile-border);
+  border-radius: var(--radius-control);
+  box-shadow: 0 5px 0 var(--color-tile-lip), 0 8px 10px rgb(0 0 0 / 0.3);
+  color: var(--color-tile-mark);
+  font: 400 18px / 28px var(--font-display);
+  letter-spacing: 0.05em;
+  cursor: pointer;
+}
+.btn-play:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 4px;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.noscript { position: fixed; inset: auto 0 0; margin: 0; padding: 1rem; text-align: center; }
+
+/* ---------- Reduced motion: ganti flip dengan fade ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .card__inner { transform: none !important; transition: none; will-change: auto; }
+
+  .face { transition: opacity 200ms linear; }
+  .face--symbol { transform: none; opacity: 0; }
+  .card.is-open .face--symbol,
+  .card.is-matched .face--symbol { opacity: 1; }
+  .card.is-open .face--cover,
+  .card.is-matched .face--cover { opacity: 0; }
+
+  .card.is-matched, .card.is-wrong, .modal[open] { animation: none; }
+  .progress__bar { transition: none; }
+}
