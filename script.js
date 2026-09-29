@@ -13,10 +13,14 @@
     ['🌙', 'bulan'], ['🔥', 'api'], ['⚡', 'petir'], ['🎈', 'balon'],
   ];
 
+  const DURATION_SECS = 60;
+  const WARNING_SECS = 10;      // tampilan timer berubah jadi peringatan
+  const ANNOUNCE_SECS = 30;     // pengumuman screen reader: 30 detik, 10 detik, habis
   const MISMATCH_DELAY = 700;
   const WIN_DELAY = 550;
   const SIZE_KEY = 'memorymatch.size.v1';
-  const BEST_KEY = 'memorymatch.best.v1';
+  // v2: menyimpan sisa waktu (detik) terbanyak. Data v1 (waktu terpakai) tidak kompatibel, jadi diabaikan.
+  const BEST_KEY = 'memorymatch.best.v2';
 
   const $ = (id) => document.getElementById(id);
   const els = {
@@ -24,7 +28,9 @@
     size: $('size'),
     restart: $('restart'),
     moves: $('moves'),
+    stat: $('time').closest('.stat'),
     time: $('time'),
+    timeIcon: $('time-icon'),
     best: $('best'),
     status: $('status'),
     progress: $('progress'),
@@ -34,6 +40,11 @@
     winTime: $('win-time'),
     winRecord: $('win-record'),
     again: $('again'),
+    over: $('over'),
+    overSummary: $('over-summary'),
+    overPairs: $('over-pairs'),
+    overMoves: $('over-moves'),
+    retry: $('retry'),
   };
 
   const portrait = window.matchMedia('(orientation: portrait)');
@@ -48,9 +59,13 @@
     return arr;
   }
 
-  function formatTime(ms) {
-    const s = Math.floor(ms / 1000);
-    return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  function formatSeconds(secs) {
+    return `${String(Math.floor(secs / 60)).padStart(2, '0')}:${String(secs % 60).padStart(2, '0')}`;
+  }
+
+  // Detik yang ditampilkan countdown: dibulatkan ke atas, jadi 00:00 hanya saat waktu benar-benar habis.
+  function secondsLeft(ms) {
+    return Math.ceil(Math.max(0, ms) / 1000);
   }
 
   function parseSize(value) {
@@ -67,9 +82,20 @@
     },
   };
 
+  // Baca skor terbaik dengan validasi bentuk data; data rusak atau format lama dianggap tidak ada.
+  function readBestAll() {
+    const all = storage.get(BEST_KEY);
+    return all && typeof all === 'object' && !Array.isArray(all) ? all : {};
+  }
+
+  function readBest(key) {
+    const b = readBestAll()[key];
+    return b && Number.isFinite(b.moves) && Number.isFinite(b.remaining) ? b : null;
+  }
+
   // ---------- State ----------
   let game = null;
-  let timerId = 0;
+  let rafId = 0;
   let mismatchTimer = 0;
   let winTimer = 0;
 
@@ -84,9 +110,16 @@
       locked: false,
       moves: 0,
       matched: 0,
-      startedAt: 0,
-      elapsed: 0,
       done: false,
+      // Countdown berbasis timestamp: endAt = performance.now() saat waktu habis.
+      remainingMs: DURATION_SECS * 1000,
+      endAt: 0,
+      running: false,
+      started: false,
+      shownSecs: DURATION_SECS,
+      warned: false,
+      said30: false,
+      said10: false,
     };
   }
 
@@ -115,7 +148,8 @@
     el.classList.toggle('is-matched', c.state === 'matched');
     el.setAttribute('aria-label', cardLabel(i));
     // aria-disabled (bukan disabled) agar fokus keyboard tidak hilang.
-    el.setAttribute('aria-disabled', c.state === 'closed' ? 'false' : 'true');
+    // Setelah game selesai semua kartu terkunci.
+    el.setAttribute('aria-disabled', c.state === 'closed' && !game.done ? 'false' : 'true');
   }
 
   function renderBoard() {
@@ -139,7 +173,7 @@
   }
 
   function renderBest() {
-    const best = (storage.get(BEST_KEY) || {})[game.size.key];
+    const best = readBest(game.size.key);
     els.best.replaceChildren();
     if (!best) {
       els.best.textContent = '–';
@@ -153,13 +187,22 @@
     };
     els.best.append(
       span('best__moves', `${best.moves} · `), span('sr-only', 'langkah, '),
-      span('best__time', formatTime(best.time)), span('sr-only', ' menit'),
+      span('best__time', formatSeconds(best.remaining)), span('sr-only', ' tersisa'),
     );
   }
 
   function renderStats() {
     els.moves.textContent = game.moves;
-    els.time.textContent = formatTime(game.elapsed);
+    renderTime(secondsLeft(game.remainingMs));
+  }
+
+  function renderTime(secs) {
+    game.shownSecs = secs;
+    els.time.textContent = formatSeconds(secs);
+    // Peringatan: warna, ikon, dan garis putus-putus (bukan hanya warna); denyut diatur di CSS.
+    const warn = secs <= WARNING_SECS && game.started;
+    els.stat.classList.toggle('is-warning', warn);
+    els.timeIcon.textContent = warn ? '⚠️' : '⏳';
   }
 
   function renderProgress() {
@@ -174,28 +217,66 @@
     els.status.textContent = msg;
   }
 
-  // ---------- Timer ----------
+  // ---------- Countdown ----------
   function startTimer() {
-    game.startedAt = performance.now();
-    timerId = setInterval(() => {
-      game.elapsed = performance.now() - game.startedAt;
-      els.time.textContent = formatTime(game.elapsed);
-    }, 250);
+    if (rafId || game.running) return;   // tidak pernah ada dua loop sekaligus
+    game.endAt = performance.now() + game.remainingMs;
+    game.running = true;
+    rafId = requestAnimationFrame(tick);
   }
 
+  // Hentikan loop dan simpan sisa waktu saat ini.
   function stopTimer() {
-    clearInterval(timerId);
-    timerId = 0;
-    if (game.startedAt) game.elapsed = performance.now() - game.startedAt;
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = 0;
+    if (game.running) game.remainingMs = Math.max(0, game.endAt - performance.now());
+    game.running = false;
+  }
+
+  function tick() {
+    rafId = 0;
+    if (!game.running || game.done) return;
+
+    const left = game.endAt - performance.now();
+    const secs = secondsLeft(left);
+    // Teks hanya diubah saat detik berganti.
+    if (secs !== game.shownSecs) {
+      renderTime(secs);
+      if (secs <= ANNOUNCE_SECS && !game.said30) {
+        game.said30 = true;
+        announce(`Tersisa ${secs} detik.`);
+      }
+      if (secs <= WARNING_SECS && !game.said10) {
+        game.said10 = true;
+        announce(`Tersisa ${secs} detik!`);
+      }
+    }
+    if (left <= 0) {
+      timeUp();
+      return;
+    }
+    rafId = requestAnimationFrame(tick);
+  }
+
+  // Jeda saat tab disembunyikan atau pemain pindah aplikasi, lanjut saat kembali.
+  function pauseTimer() {
+    if (!game || !game.running) return;
+    stopTimer();
+  }
+
+  function resumeTimer() {
+    if (!game || game.done || !game.started || game.running) return;
+    startTimer();
   }
 
   // ---------- Game flow ----------
   function restart() {
-    clearInterval(timerId);
+    if (game) stopTimer();
     clearTimeout(mismatchTimer);
     clearTimeout(winTimer);
-    timerId = mismatchTimer = winTimer = 0;
+    mismatchTimer = winTimer = 0;
     if (els.win.open) els.win.close();
+    if (els.over.open) els.over.close();
 
     game = newGame(parseSize(els.size.value));
     applyLayout();
@@ -203,14 +284,17 @@
     renderStats();
     renderBest();
     renderProgress();
-    announce(`Game baru, ${game.size.a} kali ${game.size.b}, ${game.size.pairs} pasangan.`);
+    announce(`Game baru, ${game.size.a} kali ${game.size.b}, ${game.size.pairs} pasangan. Waktu ${DURATION_SECS} detik.`);
   }
 
   function flip(i) {
     const card = game.cards[i];
     if (game.locked || game.done || card.state !== 'closed') return;
 
-    if (!game.startedAt) startTimer();
+    if (!game.started) {
+      game.started = true;
+      startTimer();
+    }
 
     card.state = 'open';
     paintCard(i);
@@ -232,6 +316,7 @@
       game.matched++;
       renderProgress();
       announce(`Cocok: ${card.name}.`);
+      // Semua pasangan ditemukan = menang, prioritas di atas waktu habis.
       if (game.matched === game.size.pairs) finish();
       return;
     }
@@ -241,6 +326,7 @@
     const pair = [j, i].map((k) => els.board.children[k]);
     pair.forEach((el) => el.classList.add('is-wrong'));
     mismatchTimer = setTimeout(() => {
+      mismatchTimer = 0;
       card.state = game.cards[j].state = 'closed';
       paintCard(i);
       paintCard(j);
@@ -249,43 +335,102 @@
     }, MISMATCH_DELAY);
   }
 
-  function saveBest() {
-    const all = storage.get(BEST_KEY) || {};
-    const prev = all[game.size.key];
-    const time = Math.round(game.elapsed);
+  function saveBest(remaining) {
+    const all = readBestAll();
+    const prev = readBest(game.size.key);
     const record = {
       moves: !prev || game.moves < prev.moves,
-      time: !prev || time < prev.time,
+      time: !prev || remaining > prev.remaining,
       first: !prev,
     };
     all[game.size.key] = {
       moves: record.moves ? game.moves : prev.moves,
-      time: record.time ? time : prev.time,
+      remaining: record.time ? remaining : prev.remaining,
     };
     storage.set(BEST_KEY, all);
     return record;
   }
 
+  // Satu pintu untuk membuka modal: tidak pernah ada dua modal sekaligus, fokus ke tombol utama.
+  function openModal(dialog, focusEl) {
+    [els.win, els.over].forEach((d) => { if (d !== dialog && d.open) d.close(); });
+    if (!dialog.open) dialog.showModal();
+    focusEl.focus();
+  }
+
   function finish() {
+    if (game.done) return;
     game.done = true;
     game.locked = true;
     stopTimer();
-    renderStats();
-    const record = saveBest();
+    const remaining = secondsLeft(game.remainingMs);
+    renderTime(remaining);
+    game.cards.forEach((_, i) => paintCard(i));
+    const record = saveBest(remaining);
     renderBest();
 
     els.winMoves.textContent = game.moves;
-    els.winTime.textContent = formatTime(game.elapsed);
+    els.winTime.textContent = formatSeconds(remaining);
     const notes = [];
     if (record.moves) notes.push('langkah');
-    if (record.time) notes.push('waktu');
+    if (record.time) notes.push('sisa waktu');
     els.winRecord.hidden = notes.length === 0;
     els.winRecord.textContent = record.first
       ? 'Skor pertamamu untuk ukuran ini tersimpan!'
       : `Rekor baru: ${notes.join(' & ')} terbaik!`;
 
-    announce(`Selesai dalam ${game.moves} langkah, waktu ${formatTime(game.elapsed)}.`);
-    winTimer = setTimeout(() => els.win.showModal(), WIN_DELAY);
+    announce(`Menang! Selesai dalam ${game.moves} langkah, sisa waktu ${formatSeconds(remaining)}.`);
+    winTimer = setTimeout(() => openModal(els.win, els.again), WIN_DELAY);
+  }
+
+  function timeUp() {
+    if (game.done) return;
+    // Pertahanan ganda: jika semua pasangan sudah ditemukan, itu kemenangan.
+    if (game.matched === game.size.pairs) {
+      finish();
+      return;
+    }
+    game.done = true;
+    game.locked = true;
+    game.remainingMs = 0;
+    stopTimer();
+
+    // Batalkan pengecekan yang tertunda dan tutup kartu yang masih terbuka (belum dicek).
+    clearTimeout(mismatchTimer);
+    mismatchTimer = 0;
+    game.first = -1;
+    game.cards.forEach((c) => { if (c.state === 'open') c.state = 'closed'; });
+    game.cards.forEach((_, i) => {
+      els.board.children[i].classList.remove('is-wrong');
+      paintCard(i);
+    });
+
+    renderStats();
+    const total = game.size.pairs;
+    els.overSummary.textContent = `Waktu habis! Kamu menemukan ${game.matched} dari ${total} pasangan.`;
+    els.overPairs.textContent = `${game.matched}/${total}`;
+    els.overMoves.textContent = game.moves;
+    announce(`Game Over. Waktu habis. ${game.matched} dari ${total} pasangan ditemukan dalam ${game.moves} langkah.`);
+    openModal(els.over, els.retry);
+  }
+
+  // Jaga fokus Tab/Shift+Tab tetap di dalam modal.
+  function trapFocus(dialog) {
+    dialog.addEventListener('keydown', (e) => {
+      if (e.key !== 'Tab') return;
+      const items = [...dialog.querySelectorAll('button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])')];
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      const active = document.activeElement;
+      if (!dialog.contains(active) || (e.shiftKey && active === first)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    });
   }
 
   // ---------- Events ----------
@@ -302,10 +447,18 @@
 
   els.restart.addEventListener('click', restart);
 
-  els.again.addEventListener('click', () => {
-    els.win.close();
-    restart();
-    els.board.querySelector('.card')?.focus();
+  [els.again, els.retry].forEach((btn) => {
+    btn.addEventListener('click', () => {
+      restart();
+      els.board.querySelector('.card')?.focus();
+    });
+  });
+
+  [els.win, els.over].forEach(trapFocus);
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) pauseTimer();
+    else resumeTimer();
   });
 
   portrait.addEventListener('change', applyLayout);

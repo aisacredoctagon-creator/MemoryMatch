@@ -41,6 +41,8 @@
   --color-value-moves: #fef3c7;
   --color-value-time: #fde047;
   --color-value-best: #fde68a;
+  --color-warn: #fca5a5;           /* countdown 10 detik terakhir (kontras 7:1 di atas panel) */
+  --color-warn-border: #f87171;
 
   /* ---------- Warna: progres & footer ---------- */
   --color-track-bg: #1e1005;
@@ -433,6 +435,10 @@ button, select { font: inherit; color: inherit; touch-action: manipulation; }
   height: var(--value-lh);
   color: var(--color-value-best);
 }
+.stat.is-warning { border-color: var(--color-warn-border); border-style: dashed; }
+.stat.is-warning dt,
+.stat.is-warning .stat__value--time { color: var(--color-warn); }
+.stat.is-warning .stat__value--time { animation: pulse 1s ease-in-out infinite; }
 .best__moves { font-size: var(--value-best-lg); line-height: 1; white-space: pre; }
 .best__time { font-size: var(--value-best-sm); line-height: 1; }
 
@@ -651,6 +657,10 @@ button, select { font: inherit; color: inherit; touch-action: manipulation; }
   .card:not(.is-open):not(.is-matched):hover .face--cover { filter: brightness(1.08); }
 }
 
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+}
 @keyframes pop {
   0%, 100% { transform: scale(1); }
   45% { transform: scale(1.06); }
@@ -781,4 +791,5 @@ button, select { font: inherit; color: inherit; touch-action: manipulation; }
 
   .card.is-matched, .card.is-wrong, .modal[open] { animation: none; }
   .progress__bar { transition: none; }
+  .stat.is-warning .stat__value--time { animation: none; }
 }

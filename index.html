@@ -77,8 +77,8 @@
         <dd id="moves" class="stat__value stat__value--moves">0</dd>
       </div>
       <div class="stat">
-        <dt><span aria-hidden="true">⏳</span> Waktu</dt>
-        <dd id="time" class="stat__value stat__value--time">0:00</dd>
+        <dt><span id="time-icon" aria-hidden="true">⏳</span> Waktu<span class="sr-only"> tersisa</span></dt>
+        <dd id="time" class="stat__value stat__value--time">01:00</dd>
       </div>
       <div class="stat">
         <dt><span aria-hidden="true">🏆</span> Terbaik</dt>
@@ -112,7 +112,7 @@
 
   <p id="status" class="sr-only" role="status" aria-live="polite"></p>
 
-  <dialog id="win" class="modal" aria-labelledby="win-title">
+  <dialog id="win" class="modal" role="dialog" aria-modal="true" aria-labelledby="win-title">
     <h2 id="win-title" class="modal__title">Selamat! 🎉</h2>
     <p class="modal__lead">Semua pasangan berhasil ditemukan.</p>
     <dl class="modal__stats">
@@ -121,12 +121,28 @@
         <dd id="win-moves">0</dd>
       </div>
       <div>
-        <dt>Waktu</dt>
-        <dd id="win-time">0:00</dd>
+        <dt>Sisa waktu</dt>
+        <dd id="win-time">00:00</dd>
       </div>
     </dl>
     <p id="win-record" class="modal__record" hidden></p>
     <button type="button" id="again" class="btn-play" autofocus>Main Lagi</button>
+  </dialog>
+
+  <dialog id="over" class="modal" role="dialog" aria-modal="true" aria-labelledby="over-title">
+    <h2 id="over-title" class="modal__title">Game Over</h2>
+    <p id="over-summary" class="modal__lead">Waktu habis!</p>
+    <dl class="modal__stats">
+      <div>
+        <dt>Pasangan</dt>
+        <dd id="over-pairs">0/0</dd>
+      </div>
+      <div>
+        <dt>Langkah</dt>
+        <dd id="over-moves">0</dd>
+      </div>
+    </dl>
+    <button type="button" id="retry" class="btn-play" autofocus>Coba Lagi</button>
   </dialog>
 
   <noscript><p class="noscript">Game ini membutuhkan JavaScript.</p></noscript>

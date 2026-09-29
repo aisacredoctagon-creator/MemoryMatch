@@ -7,8 +7,8 @@ Game mencocokkan kartu bertema hutan. Situs statis murni (HTML + CSS + JavaScrip
 ## Cara main
 1. Pilih ukuran papan di dropdown **Ukuran** (4×4, 4×5, 5×6, 6×6, atau 6×8). Mengganti ukuran langsung memulai game baru.
 2. Balik dua kartu per giliran. Kalau gambarnya sama, kartu tetap terbuka dan diberi tanda centang. Kalau beda, keduanya menutup lagi setelah jeda singkat.
-3. Temukan semua pasangan secepat dan sesedikit langkah mungkin. Timer mulai saat kartu pertama dibalik.
-4. Rekor terbaik (langkah dan waktu) tersimpan per ukuran papan di browser (`localStorage`).
+3. Kamu punya 1 menit. Countdown mulai saat kartu pertama dibalik dan berhenti sementara jika tab disembunyikan. Di 10 detik terakhir timer berubah merah dan berdenyut. Jika waktu habis sebelum semua pasangan ditemukan, muncul pop-up **Game Over** dengan tombol **Coba Lagi**.
+4. Rekor terbaik (langkah paling sedikit dan sisa waktu terbanyak) tersimpan per ukuran papan di browser (`localStorage`).
 5. Tombol **Ulang** memulai game baru kapan saja.
 
 Bisa dimainkan dengan keyboard (Tab untuk pindah kartu, Enter/Space untuk membalik). Animasi flip diganti fade jika perangkat memakai `prefers-reduced-motion`.
